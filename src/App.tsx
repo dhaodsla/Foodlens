@@ -20,6 +20,7 @@ interface JournalEntry extends FoodData {
 }
 
 export default function App() {
+  const [showLanding, setShowLanding] = useState(true);
   const [activeTab, setActiveTab] = useState<'scanner' | 'journal'>('scanner');
   const [journalEntries, setJournalEntries] = useState<JournalEntry[]>([]);
   const [imageUri, setImageUri] = useState<string | null>(null);
@@ -169,6 +170,47 @@ export default function App() {
       setLoading(false);
     }
   };
+
+  if (showLanding) {
+    return (
+      <div className="min-h-screen bg-[#080808] text-stone-200 font-sans selection:bg-stone-500 selection:text-white flex flex-col items-center justify-center relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[300px] h-[300px] sm:w-[600px] sm:h-[600px] bg-stone-900/40 rounded-full blur-[80px]" />
+        </div>
+        <div className="z-10 flex flex-col items-center text-center max-w-2xl px-6">
+          <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.1 }}>
+            <div className="w-16 h-16 bg-stone-100 rounded-full flex items-center justify-center mb-8 mx-auto shadow-[0_0_40px_rgba(255,255,255,0.1)]">
+              <div className="w-6 h-6 bg-black rounded-sm rotate-45"></div>
+            </div>
+          </motion.div>
+          
+          <motion.h1 initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }} className="text-5xl sm:text-7xl font-light italic serif text-stone-100 mb-6" style={{ fontFamily: 'Georgia, serif' }}>
+            FoodLens
+          </motion.h1>
+          
+          <motion.p initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }} className="text-stone-400 text-lg sm:text-xl leading-relaxed mb-12 max-w-md">
+            인공지능이 분석하는 나만의 식단 기록.<br/>
+            사진 한 장으로 칼로리와 영양성분을 확인하세요.
+          </motion.p>
+          
+          <motion.button 
+            initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}
+            onClick={() => setShowLanding(false)}
+            className="group relative px-8 py-4 bg-stone-100 text-black font-bold uppercase tracking-widest text-sm rounded-none hover:bg-stone-300 transition-all flex items-center gap-3 overflow-hidden"
+          >
+            <span className="relative z-10 w-full flex items-center justify-center gap-2">
+              시작하기
+              <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </span>
+          </motion.button>
+        </div>
+        
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }} className="absolute bottom-10 text-[10px] font-mono text-stone-600 uppercase tracking-widest">
+          Powered by Gemini • Neural Vision Engine
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#080808] text-stone-200 font-sans selection:bg-stone-500 selection:text-white pb-32 flex flex-col">
