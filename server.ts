@@ -23,22 +23,32 @@ async function startServer() {
 
   app.post("/api/analyze-food", async (req, res) => {
     try {
+      if (!process.env.GEMINI_API_KEY) {
+        return res.status(500).json({ error: "API 키가 설정되지 않았습니다. Render에서 GEMINI_API_KEY 환경 변수를 등록해주세요." });
+      }
+
       const { imageBase64, mimeType } = req.body;
       if (!imageBase64 || !mimeType) {
         return res.status(400).json({ error: "Missing imageBase64 or mimeType" });
       }
+      
+      console.log(`Received image analysis request. MimeType: ${mimeType}, Base64 length: ${imageBase64.length}`);
 
       const response = await ai.models.generateContent({
-        model: "gemini-2.0-flash", 
-        contents: [
-          {
-            inlineData: {
-              data: imageBase64,
-              mimeType: mimeType,
+        model: "gemini-3.5-flash", 
+        contents: {
+          parts: [
+            {
+              inlineData: {
+                data: imageBase64,
+                mimeType: mimeType,
+              },
             },
-          },
-          "Analyze this food image. Identify the food item, estimate the total calories for the entire portion shown, estimate the portion weight in grams, provide the calories per 100g, and provide a rough macronutrient breakdown (protein, carbs, fat) for the entire portion. Also provide a list of key ingredients you suspect are in it. Respond in Korean.",
-        ],
+            {
+              text: "Analyze this food image. Identify the food item, estimate the total calories for the entire portion shown, estimate the portion weight in grams, provide the calories per 100g, and provide a rough macronutrient breakdown (protein, carbs, fat) for the entire portion. Also provide a list of key ingredients you suspect are in it. Respond in Korean.",
+            }
+          ]
+        },
         config: {
           responseMimeType: "application/json",
           responseSchema: {

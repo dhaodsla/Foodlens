@@ -150,7 +150,8 @@ export default function App() {
       });
 
       if (!response.ok) {
-        throw new Error('음식 분석 중 오류가 발생했습니다.');
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error || '음식 분석 중 서버 쪽에 알 수 없는 오류가 발생했습니다.');
       }
 
       const data = await response.json();
