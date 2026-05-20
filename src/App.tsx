@@ -86,48 +86,44 @@ export default function App() {
 
   const fileToBase64 = (file: File): Promise<{base64: string, mimeType: string}> => {
     return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          let width = img.width;
-          let height = img.height;
-          const maxDim = 800;
+      const img = new Image();
+      img.onload = () => {
+        URL.revokeObjectURL(img.src);
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        const maxDim = 800;
 
-          if (width > height) {
-            if (width > maxDim) {
-              height *= maxDim / width;
-              width = maxDim;
-            }
-          } else {
-            if (height > maxDim) {
-              width *= maxDim / height;
-              height = maxDim;
-            }
+        if (width > height) {
+          if (width > maxDim) {
+            height *= maxDim / width;
+            width = maxDim;
           }
+        } else {
+          if (height > maxDim) {
+            width *= maxDim / height;
+            height = maxDim;
+          }
+        }
 
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          if (!ctx) {
-             reject(new Error('Canvas context is null'));
-             return;
-          }
-          ctx.drawImage(img, 0, 0, width, height);
-          
-          // Use jpeg for compression
-          const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-          resolve({
-            base64: dataUrl.split(',')[1],
-            mimeType: 'image/jpeg'
-          });
-        };
-        img.onerror = () => reject(new Error('Failed to load image'));
-        img.src = e.target?.result as string;
+        canvas.width = Math.max(1, Math.floor(width));
+        canvas.height = Math.max(1, Math.floor(height));
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+           reject(new Error('Canvas context is null'));
+           return;
+        }
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        
+        // Use jpeg for compression
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+        resolve({
+          base64: dataUrl.split(',')[1],
+          mimeType: 'image/jpeg'
+        });
       };
-      reader.onerror = error => reject(error);
-      reader.readAsDataURL(file);
+      img.onerror = () => reject(new Error('사진을 불러오는데 실패했습니다. 다른 사진을 선택해주세요.'));
+      img.src = URL.createObjectURL(file);
     });
   };
 
